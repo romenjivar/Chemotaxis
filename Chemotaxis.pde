@@ -1,138 +1,168 @@
-int speed = 2; // speed variable which will be used by buttons (under border) to increase or decrease speed
+int pressure = 13;
 
-class Snake{
- int myX, myY, myColor; 
- Snake(int x, int y){
- myX = x;
- myY = y;
- myColor = color((int)(Math.random()*255), 
-                 (int)(Math.random()*255), 
-                 (int)(Math.random()*255));
+class Walker{
+  //two member vars
+  int myX, myY, myColor;
+  
+  //3 member functions
+  //one special one: Constructor
+  //Will initialize member variables
+  Walker(){
+   myX = 350;
+   myY = 500;
+   myColor = color(255,255,255);
+  }
+  Walker(int x, int y){ //overloading a constructor
+  myX = 350;
+  myY = 500;
+  myColor = color((int)(Math.random()*255), 
+                  (int)(Math.random()*255), 
+                  (int)(Math.random()*255));
+  }
+ void walk(){
+ myX = myX + (int)(Math.random()*pressure)-(pressure/2);
+ myY = myY + (int)(Math.random()*pressure)-(pressure/2); 
+ if(pressure <= 50){
+ if (myX < 100) {
+        myX = 100;
+    } else if (myX > 600) {
+        myX = 600;
+    }
+    
+    if (myY < 200) {
+        myY = 200;
+    } else if (myY > 800) {
+        myY = 800;
+    }
  }
- 
- void slither(){
-  myX = myX + (int)(Math.random()*speed);
- }
- 
+}
  void show(){
-   noStroke();
-  fill(myColor);
-  ellipse(myX,myY,50,50);
-  fill(0);
-  ellipse(myX+10,myY-10,10,10);
-  ellipse(myX-10,myY-10,10,10);
-  fill(255,0,0);
+   fill(myColor);
+ ellipse(myX,myY,10,10);
  }
- 
-} //end of Snake class
+  
+}// end of Walker class
 
-Snake [] reptiles;
-
+Walker [] ohio;
 void setup(){
-  size(700,500);
-  
-  
-  //creation of buttons
-  fill(0);
- textSize(30);
- text("Use these buttons to increase/decrease their speed!",25,400);
- fill(0,255,0);
- rect(100,425,50,50);
- fill(255,0,0);
- rect(500,425,50,50);
- 
- //creation of border 
+ size(1000,1000); 
+
+ ohio = new Walker[150]; //first call to new
+ for(int i =0; i < ohio.length; i++){
+  ohio[i] = new Walker((int)(Math.random()*width), (int)(Math.random()*height)); //second call to new
+ }
+ //WITH ARRAY OF OBJECTS THERE ARE 2+ CALLS TO NEW
+}
+
+/* void increaseButton(){
+  int buttonColor = color(255,255,255);
+  stroke(1);
+  fill(buttonColor);
+ rect(800,550,100,100,10); 
  fill(0);
-  rect(0,360,700,5);
+ textSize(15);
+ text("Increase",825,600);
+}
+void decreaseButton(){
+  int buttonColor = color(255,255,255);
+ stroke(1);
+ fill(buttonColor);
+ rect(800,675,100,100,10);
+ fill(0);
+ textSize(15);
+ text("Decrease",825,725);
+}*/
+
+void increaseButton() {
+  int buttonColor = color(255, 255, 255);
+  float buttonCenterX = 850;
+  float buttonCenterY = 600;
+  float buttonWidth = 100;
+  float buttonHeight = 100;
   
+  // Calculate distance to center of the button
+  float d = dist(mouseX, mouseY, buttonCenterX, buttonCenterY);
+  // Check if distance is within half the width and height of the button
+  if (d < buttonWidth / 2 && d < buttonHeight / 2) {
+    buttonColor = color(0, 255, 0); // Green when hovered
+  }
+  fill(buttonColor);
+  stroke(1);
+  rect(buttonCenterX - buttonWidth / 2, buttonCenterY - buttonHeight / 2, buttonWidth, buttonHeight, 10);
+  fill(0);
+  textSize(15);
+  text("Increase", 825, 600);
+}
+
+void decreaseButton() {
+  int buttonColor = color(255, 255, 255);
+  float buttonCenterX = 850;
+  float buttonCenterY = 725;
+  float buttonWidth = 100;
+  float buttonHeight = 100;
   
-  //Creation of finishline
-  for(int y = 0; y < 360; y+=40)
- {
-  for(int x = 540; x < 600; x+= 60)
-  {
-    finishline1 bob = new finishline1(x,y);
-    bob.show();
+  // Calculate distance to center of the button
+  float d = dist(mouseX, mouseY, buttonCenterX, buttonCenterY);
+  // Check if distance is within half the width and height of the button
+  if (d < buttonWidth / 2 && d < buttonHeight / 2) {
+    buttonColor = color(255, 0, 0); // Red when hovered
   }
- }
- for(int y = 20; y < 360; y+=40)
- {
-  for(int x = 540; x < 600; x+= 60)
-  {
-    finishline2 sue = new finishline2(x,y);
-    sue.show();
+  fill(buttonColor);
+  stroke(1);
+  rect(buttonCenterX - buttonWidth / 2, buttonCenterY - buttonHeight / 2, buttonWidth, buttonHeight, 10);
+  fill(0);
+  textSize(15);
+  text("Decrease", 825, 725);
+}
+
+void mousePressed() {
+  // Check if the mouse is within the increase button 
+  float dIncrease = dist(mouseX, mouseY, 850, 600);
+  if (dIncrease < 50) { // half of the button's width or height
+    pressure += 2; 
   }
- }
- 
- // Creation of snakes
- 
- reptiles = new Snake[5]; //first call to new
- for(int i = 0; i < reptiles.length; i++){
-  reptiles[i] = new Snake(0,i*75+25);
- }
+  
+  // Check if the mouse is within the decrease button
+  float dDecrease = dist(mouseX, mouseY, 850, 725);
+  if (dDecrease < 50) { // half of the button's width or height
+    pressure -= 2;
+    if (pressure < 1) pressure = 1;
+  }
 }
 
 void draw(){
-  for(int i = 0; i < reptiles.length; i++){
- reptiles[i].slither();
- reptiles[i].show();
- if (reptiles[i].myX > 600) {
-      println("Snake " + (i+1) + " has won!");
-      textSize(20);
-      fill(0);
-      text(("Snake " + (i+1) + " has won!"), 0, 700);
-      noLoop();
+  background(0);
+  //container
+  if(pressure <= 50){
+  fill(#6FE8FF);
+  rect(100,200,500,600,10);
   }
- }
-}
+  //thermometer or pressure counter
+  fill(255);
+  rect(750,200,200,600,10);
+  //buttons to regulate pressure
+  increaseButton();
+  decreaseButton();
+  fill(255);
+  textSize(30);
+  text(("Pressure:" + (pressure - 1)) ,775,190);
 
-void mousePressed(){
-  //increase button
-if (mouseX > 100 && mouseX < 150 && mouseY > 425 && mouseY < 475) {
-    speed++;
+  if(pressure == 1){
+    fill(255);
+    textSize(50);
+   text("Absolute Zero", 200, 190); 
   }
   
-  //decrease button
-  if (mouseX > 500 && mouseX < 550 && mouseY > 425 && mouseY < 475) {
-    speed--;
-    
-    //make sure speed cannot be negative
-    if (speed < 0) {
-      speed = 0;
-    }
-  }
-  loop();
-}
-
-
-class finishline1
-{
-  int myX, myY;
-  finishline1(int x, int y){
-   myX = x;
-   myY = y;
-  }
-  void show(){
-   noStroke();
-   fill(0);
-   rect(myX,myY,60,20);
+  if(pressure > 50){
    fill(255);
-   rect(myX+20,myY,20,20);
+   textSize(50);
+   text("Pressure too high!", 200,190);
   }
-}//end of finishline1
-
-class finishline2
-{
-  int myX, myY;
-  finishline2(int x, int y){
-   myX = x;
-   myY = y;
+  
+  noStroke();
+  for(int i = 0; i < ohio.length; i++){
+   ohio[i].walk();
+   ohio[i].show();   
   }
-  void show(){
-   noStroke();
-   fill(255);
-   rect(myX,myY,60,20);
-   fill(0);
-   rect(myX+20,myY,20,20);
-  }
-}//end of finishline2
+  
+} 
